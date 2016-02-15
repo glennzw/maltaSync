@@ -64,15 +64,16 @@ class MaltASync(controller.Master):
 
     def qWatcher(self):
         lastL, lastD = -1, -1
+        print "[+] Starting queue monitor:"
         while self.letsGo:
-            time.sleep(2)
+            time.sleep(4)
             n = 0 
             l = len(self.futures)
             for k,v in self.futures.iteritems():
                 if v.done():
                     n+=1
             if lastL != l or lastD != n:
-                print "Q: %d, Done: %d" %(l, n)
+                print "    Transforms in Queue: %d. Completed Transforms: %d" %(l, n)
                 lastL = l
                 lastD = n
 
@@ -116,10 +117,12 @@ class MaltASync(controller.Master):
 
 if __name__ == "__main__":
     import sys
+    port = 8080
     workers = 10
     if len(sys.argv) > 1:
-        workers = sys.argv[1]
-    config = proxy.ProxyConfig(port=8080)
+        workers = int(sys.argv[1])
+    print "[+] Starting Transform proxy with %d async workers on port %d..." % (workers,port)
+    config = proxy.ProxyConfig(port=port)
     server = ProxyServer(config)
     ms = MaltASync(server, workers)
 ms.run()
